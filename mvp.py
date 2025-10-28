@@ -61,10 +61,10 @@ def fmt_eta(seconds: float) -> str:
     return f"{m}m {s}s" if m else f"{s}s"
 
 # -------------------------------- API & Models ---------------------------------------
-# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY_MOSTAFA")
+# OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY_MOSTAFA")
 
 # Ihab Key
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 SUPPORTED_MODELS = ["gpt-4.1", "gpt-5"]
