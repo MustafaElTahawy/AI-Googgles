@@ -1,0 +1,22 @@
+/.venv
+/25_6Y_96577_9280-W_2788[1].pdf
+/25_6Y_96577_9280-W_2801[1].pdf
+/25_6Y_96577_9280-W_2801[1].pdf.report.pdf
+/25_6Y_96577_9280-W_2807[1].pdf
+/25_6Y_96577_9280-W_2809[1].pdf
+/25_6Y_96577_9280-W_2813[1].pdf
+/25_6Y_96577_9280-W_2816[1].pdf
+/25_6Y_96577_9280-W_2955[1] (1).pdf
+/25_6Y_96577_9280-W_2955[1].pdf
+/25_6Y_96577_9280-W_2956[1].pdf
+/25_6Y_96577_9280-W_2959[1].pdf
+/25_6Y_96577_9280-W_2960[1].pdf
+/Abdel Rahman Mohamed Hassan Ali Hassan.report.pdf
+/Abdelrahman Mohamed Hassan Ali Hassan.report.pdf
+/AQA-9280-W-Final-MS-Jun25-v1.0[1].pdf
+/MOSTAFA AHMED MOHAMED WAGIH AHMED MORSY.report.pdf
+
+.env
+*.env
+.streamlit/secrets.toml
+__pycache__/
