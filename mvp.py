@@ -61,10 +61,10 @@ def fmt_eta(seconds: float) -> str:
     return f"{m}m {s}s" if m else f"{s}s"
 
 # -------------------------------- API & Models ---------------------------------------
-# OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY_MOSTAFA")
+OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY_MOSTAFA")
 
 # Ihab Key
-OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
+# OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
 
 if not OPENAI_API_KEY:
     st.error("OPENAI_API_KEY is not set. Add it in Streamlit Cloud → App → Settings → Secrets.")
@@ -82,7 +82,7 @@ def init_state():
         "rubric": None,       # RubricExtract or None
         "llm_model": SUPPORTED_MODELS[0],
         "render_scale": 2.2,  # image resolution: 1.8–2.5 typical
-        "verbose": True,
+        "verbose": False,
         "_last_refresh": 0.0,
     }
     for k, v in defaults.items():
@@ -650,25 +650,25 @@ if st.button("Submit for Marking", type="primary", disabled=not papers):
 st.divider()
 
 # ---- Step 3: Queue & results ----
+# ---- Step 3: Marking Queue & Results
 st.subheader("Step 3: Marking Queue & Results")
 
 jobs_dict: Dict[str, JobStatus] = st.session_state.get("jobs", {})
 if not jobs_dict:
     st.info("No active jobs.")
 else:
-    # Auto-refresh while any job is running
+    # 1) Compute running flag first
     running = any(j.status in ("QUEUED", "EXTRACTING", "MARKING") for j in jobs_dict.values())
-    if running:
-        now = time.time()
-        if now - st.session_state.get("_last_refresh", 0.0) > 2.0:
-            st.session_state["_last_refresh"] = now
-            safe_rerun()
 
+    # 2) RENDER the job list (progress bars & details)
     for jid, job in list(jobs_dict.items()):
         with st.container(border=True):
             c1, c2, c3, c4 = st.columns([2, 2, 2, 1])
             c1.markdown(f"**{job.filename}**")
-            c2.progress(job.progress if 0.0 <= job.progress <= 1.0 else 0.0, text=job.message or "")
+            # ensure value is clipped [0, 1]
+            prog_val = job.progress if isinstance(job.progress, (int, float)) else 0.0
+            prog_val = max(0.0, min(1.0, prog_val))
+            c2.progress(prog_val, text=(job.message or ""))  # shows progress bar
             c3.markdown(f"**{job.status}**")
             if job.result and job.result.student_full_name:
                 c4.markdown(f"👤 {job.result.student_full_name}")
@@ -694,7 +694,7 @@ else:
                             for a in q.areas_for_improvement:
                                 st.markdown(f"- {a}")
 
-                # Downloads
+                # downloads...
                 report_json = json.dumps(res.model_dump(), indent=2, ensure_ascii=False)
                 st.download_button(
                     "Email Student Report",
@@ -702,7 +702,6 @@ else:
                     file_name=f"{job.result.student_full_name}.report.json",
                     mime="application/json"
                 )
-                # PDF report
                 try:
                     pdf_bytes = build_pdf_report(res)
                     st.download_button(
@@ -714,8 +713,9 @@ else:
                 except Exception as e:
                     log.exception("PDF build failed: %s", e)
                     st.error(f"PDF build failed: {e}")
-                
-                # Send Email
-                # st.button(
-                #         "Send Email"
-                #     )
+
+    # 3) AFTER rendering, trigger auto-refresh (so bars stay live)
+    if running:
+        # st.caption("⏳ Live updating… (auto-refresh ~1.5s)")
+        time.sleep(5)
+        safe_rerun()
