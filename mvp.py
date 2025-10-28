@@ -66,6 +66,10 @@ def fmt_eta(seconds: float) -> str:
 # Ihab Key
 OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
 
+if not OPENAI_API_KEY:
+    st.error("OPENAI_API_KEY is not set. Add it in Streamlit Cloud → App → Settings → Secrets.")
+    st.stop()
+
 client = OpenAI(api_key=OPENAI_API_KEY)
 SUPPORTED_MODELS = ["gpt-4.1", "gpt-5"]
 
