@@ -8,3 +8,4 @@ tenacity
 pillow
 reportlab
 dotenv
+PyMuPDF
